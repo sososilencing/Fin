@@ -37,7 +37,7 @@ public class JWTCeate {
 
                 .withAudience("user","用户")
                 .withIssuedAt(date)
-                .withExpiresAt(SetDate.setDates(0,0,6,0,0))
+                .withExpiresAt(SetDate.setDates(0,0,0,0,10))
                 .sign(algorithm);
         System.out.println("校验登陆"+token);
         return token;
@@ -53,7 +53,8 @@ public class JWTCeate {
             Claim id = jwt.getClaims().get("id");
             Claim name = jwt.getClaims().get("name");
             user.setId(id.asInt());
-            user.setPassword(name.asString());
+            user.setName(name.asString());
+
         }catch (JWTVerificationException exception){
             try {
                 throw new MyException("400","校验错误");

@@ -1,25 +1,91 @@
 package com.backend.roxi.service;
 
+import org.springframework.stereotype.Service;
+
 /**
  * @author Roxi酱
  */
+
+@Service
 public class CoreService {
 
-    final int FOUR=4;
+    private final int FOUR=4;
     /**
      * 五子棋 判断是否逻辑胜利
      */
     public boolean victory(int who,int[][] map,int x,int y) {
-        boolean flag=heng(who, map,x,y);
-        if(flag){
-            return true;
-        }
-        flag=shu(who, map,x,y);
+        return shu(who, map,x,y)||xie(who, map,x,y)||heng(who, map,x,y);
+    }
+    /**
+     * 斜着统计
+     */
+    private boolean xie(int who,int[][] map,int x,int y){
+        int count=0;
+        boolean heng;
+        boolean shu;
+        System.out.println("斜着来");
+        //右下斜
+        int i=x,j=y;
+        do {
 
-        if(flag){
-            return true;
-        }
-        return false;
+            if(map[i][j]==who) {
+                count++;
+                System.out.println("x:"+i+" y:"+j);
+                i++;
+                j++;
+            }else {
+                break;
+            }
+            heng= i<=y+FOUR && i<map.length;
+            shu= j < map[x].length && j <= y + FOUR;
+        }while ( heng && shu );
+
+        //左上斜
+       i=x-1; j=y-1;
+        do {
+            if(map[i][j]==who) {
+                System.out.println("x:"+i+" y:"+j);
+                count++;
+                i--;
+                j--;
+            }else {
+                break;
+            }
+            heng = (i >= x - FOUR && i > 0);
+            shu =(j > 0 && j >= y - FOUR) ;
+        }while ( heng && shu );
+
+        //左下
+        i=x-1; j=y+1;
+        do {
+            if(map[i][j]==who) {
+                System.out.println("x:"+i+" y:"+j);
+                count++;
+                i--;
+                j++;
+            }else {
+                break;
+            }
+            heng= i>= x - FOUR && i > 0;
+            shu= j < map[x].length && j <= y + FOUR;
+        }while ( heng && shu );
+
+        //右上
+        i=x+1; j=y-1;
+        do {
+            if(map[i][j]==who) {
+                System.out.println("x:"+i+" y:"+j);
+                count++;
+                i++;
+                j--;
+            }else {
+                break;
+            }
+            heng= i<=y+FOUR && i<map.length;
+            shu= j > 0 && j >= y - FOUR;
+        }while ( heng && shu );
+        System.out.println(count);
+        return count >= 5;
     }
 
     /**
@@ -48,10 +114,7 @@ public class CoreService {
             }
         }
 
-        if(count>=5){
-            return true;
-        }
-        return false;
+        return count >= 5;
     }
 
     /**
@@ -80,11 +143,8 @@ public class CoreService {
             }
         }
 
-        if(count>=5){
-            return true;
-        }
-        
-        return false;
+        return count >= 5;
+
     }
 
 }

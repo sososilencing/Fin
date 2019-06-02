@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>五子棋对战室</title>
+</head>
+<body>
+hello
+
+输入你要加入的房间: <input id="room" type="text" > <button onclick="send()">Send</button><br>
+<button onclick="ready()">准备</button>
+x:<input id="x" type="text"> y:<input id="y" type="text"><button onclick="to()">你想下哪个坐标呢</button>
+<h3 style="align-content: center">向游戏大厅发消息::</h3>
+<input id="context" type="text"  ><button onclick="sendAll()">Send</button>
+<div id="below">
+
+</div>
+</body>
+
+<script type="text/javascript">
+
+    var websocket=null;
+    var host=location.hostname;
+    var port=location.port;
+    var url="ws://"+host+":"+port+"/room";
+
+    var socket=null;
+    var url1="ws://"+host+":"+port+"/game";
+
+    if('WebSocket' in window){
+        websocket=new WebSocket(url);
+    }else {
+        alert("不支持 websocket 连接");
+    }
+
+    websocket.onerror=function () {
+
+    };
+
+    websocket.onopen=function () {
+
+    };
+
+    websocket.onmessage=function (event) {
+        document.getElementById("below").innerHTML +=event.data+'<br/>'
+    };
+
+    websocket.onclose=function () {
+
+    };
+
+    window.onbeforeunload = function(){
+        websocket.close();
+    };
+    function send() {
+        var con={};
+        con["type"]="1";
+        con["room"]=document.getElementById("room").value;
+        var json=JSON.stringify(con);
+        alert(json);
+        websocket.send(json);
+    }
+    function ready() {
+        f();
+        start();
+    }
+
+    function f() {
+        var con={};
+        con["type"]="2";
+        var json=JSON.stringify(con);
+        websocket.send(json);
+    }
+
+    function start() {
+        if('WebSocket' in window){
+            socket=new WebSocket(url1);
+        }else {
+            alert("不支持 websocket 连接");
+        }
+        socket.onerror=function g() {
+
+        };
+
+        socket.onopen=function g() {
+            alert("打开了吗");
+        };
+
+        socket.onmessage=function g(event) {
+            document.getElementById("below").innerHTML +=event.data+'<br/>'
+        };
+
+        socket.onclose=function g() {
+
+        };
+
+        window.onbeforeunload = function g(){
+            socket.close();
+        };
+    }
+
+
+    function to() {
+        var  con={};
+        con["type"]="3";
+        con["x"]=document.getElementById("x").value;
+        con["y"]=document.getElementById("y").value;
+        var json=JSON.stringify(con);
+        socket.send(json);
+    }
+
+    function sendAll() {
+        var  con={};
+        con["type"]="4";
+        con["context"]=document.getElementById("context").value;
+        var json=JSON.stringify(con);
+        websocket.send(json);
+    }
+
+</script>
+</html>
