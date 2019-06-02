@@ -36,6 +36,8 @@ public class GameRoomSocket {
     private static RoomService roomService;
     private static CoreService coreService;
 
+
+    private static Map<String,Integer> counts=RoomSocket.counts;
     /**
      * 每个房间的游戏盘
      */
@@ -88,35 +90,48 @@ public class GameRoomSocket {
                 chess.setWho(2);
             }
             System.out.println(chess);
-            int[][] map=maps.get(room);
-            if(map!=null && map[chess.getX()][chess.getY()]!=0){
+            int count=counts.get(room);
+            if(count%2==0 && chess.getWho()!=2){
                 for(int id:userList) {
-                    if(chess.getWho()==1) {
-                        userSession.get(id).getBasicRemote().sendText("黑方落子于：x，y -->[" + chess.getX() + "," + chess.getY() + "] 是错误的，请重下");
-                    }else {
-                        userSession.get(id).getBasicRemote().sendText("白方落子于：x，y -->[" + chess.getX() + "," + chess.getY() + "] 是错误的，请重下");
-                    }
+                    userSession.get(id).getBasicRemote().sendText("该白方落子");
+                }
+            }else if(count%2==1 && chess.getWho()!=1){
+                for(int id:userList) {
+                    userSession.get(id).getBasicRemote().sendText("该黑方落子");
                 }
             }else {
-                map = roomService.changeMap(map, chess, room, chess.getWho());
-                maps.put(room, map);
-                System.out.println(room);
-
-                System.out.println("who:" + chess.getWho());
-                if (coreService.victory(chess.getWho(), maps.get(room), chess.getX(), chess.getY())) {
+                int[][] map = maps.get(room);
+                if (map != null && map[chess.getX()][chess.getY()] != 0) {
                     for (int id : userList) {
                         if (chess.getWho() == 1) {
-                            userSession.get(id).getBasicRemote().sendText("黑方win");
+                            userSession.get(id).getBasicRemote().sendText("黑方落子于：x，y -->[" + chess.getX() + "," + chess.getY() + "] 是错误的，请重下");
                         } else {
-                            userSession.get(id).getBasicRemote().sendText("白方win");
+                            userSession.get(id).getBasicRemote().sendText("白方落子于：x，y -->[" + chess.getX() + "," + chess.getY() + "] 是错误的，请重下");
                         }
                     }
                 } else {
-                    for (int id : userList) {
-                        if (chess.getWho() == 1) {
-                            userSession.get(id).getBasicRemote().sendText("黑方落子于：x，y -->[" + chess.getX() + "," + chess.getY() + "]");
-                        } else {
-                            userSession.get(id).getBasicRemote().sendText("白方落子于：x，y -->[" + chess.getX() + "," + chess.getY() + "]");
+                    counts.put(room,counts.get(room)+1);
+                    map = roomService.changeMap(map, chess, room, chess.getWho());
+                    maps.put(room, map);
+                    System.out.println(room);
+                    System.out.println("who:" + chess.getWho());
+                    if (coreService.victory(chess.getWho(), maps.get(room), chess.getX(), chess.getY())) {
+                        map = new int[16][16];
+                        counts.put(room,1);
+                        for (int id : userList) {
+                            if (chess.getWho() == 1) {
+                                userSession.get(id).getBasicRemote().sendText("黑方win");
+                            } else {
+                                userSession.get(id).getBasicRemote().sendText("白方win");
+                            }
+                        }
+                    } else {
+                        for (int id : userList) {
+                            if (chess.getWho() == 1) {
+                                userSession.get(id).getBasicRemote().sendText("黑方落子于：x，y -->[" + chess.getX() + "," + chess.getY() + "]");
+                            } else {
+                                userSession.get(id).getBasicRemote().sendText("白方落子于：x，y -->[" + chess.getX() + "," + chess.getY() + "]");
+                            }
                         }
                     }
                 }

@@ -40,6 +40,7 @@ public class RoomSocket {
     private static CopyOnWriteArraySet<RoomSocket> roomSockets=new CopyOnWriteArraySet<>();
     private User user;
 
+    protected static Map<String,Integer> counts=new HashMap<>();
     /**
      * 人对应在的哪个房间
      */
@@ -108,6 +109,7 @@ public class RoomSocket {
                 } else if ("Yes".equals(action)) {
                     String room = users.get(String.valueOf(user.getId()));
                    List<Integer> ids=rooms.get(room);
+                   counts.put(room,1);
                    for(int id:ids){
                        userSession.get(id).getBasicRemote().sendText("对战即将开始");
                    }
